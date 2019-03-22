@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "excel/export_excel/routers"
+	_ "export_excel/routers"
 	"github.com/astaxie/beego"
 )
 

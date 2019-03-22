@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"excel/export_excel/controllers"
+	"export_excel/controllers"
 	"github.com/astaxie/beego"
 )
 
