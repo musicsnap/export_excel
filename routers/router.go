@@ -10,12 +10,7 @@ func init() {
     ns :=
 		beego.NewNamespace("/v1",
 			beego.NSNamespace("/sql",
-				beego.NSInclude(
-					&controllers.MainController{},
-				),
-			),
-			beego.NSNamespace("/sql2",
-				beego.NSRouter("/get",&controllers.MainController{},"get:Sql2"),
+				beego.NSRouter("/get",&controllers.MainController{},"get:Sql"),
 			),
 		)
 	beego.AddNamespace(ns)
