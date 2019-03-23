@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 	"strings"
 	"github.com/tealeg/xlsx"
 	"fmt"
@@ -12,8 +13,15 @@ import (
 type ExcelController struct {
 	beego.Controller
 }
+//XSRF
+func (c *ExcelController) Prepare() {
+	c.EnableXSRF = false
+}
 
 func (c *ExcelController) Excel() {
+	db:=orm.NewOrm()
+	var maps []orm.Params
+
 	var file *xlsx.File
 	var sheet *xlsx.Sheet
 	var row *xlsx.Row
@@ -21,18 +29,9 @@ func (c *ExcelController) Excel() {
 	var err error
 
 	sql := c.GetString("sql")
-	sql2 := c.GetString("sql2")
 	fmt.Println(sql)
-	fmt.Println("sql2:", sql2)
 	start := time.Now()
 
-	defer func() {
-		if len(sql2) > 1 {
-			db.Raw(sql2).Exec()
-			fmt.Println("defer run,", sql2)
-		}
-
-	}()
 	file = xlsx.NewFile()
 	sheet, err = file.AddSheet("Sheet1")
 
@@ -49,7 +48,7 @@ func (c *ExcelController) Excel() {
 
 		//由于map是无序的 这个地方取一个有序的数组来循环
 		for key, _ := range input {
-			if key == "sql" || key == "sql2" {
+			if key == "sql" {
 				continue
 			}
 
