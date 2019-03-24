@@ -10,7 +10,7 @@ func init() {
     ns :=
 		beego.NewNamespace("/v1",
 			beego.NSNamespace("/sql",
-				beego.NSRouter("/get",&controllers.ExcelController{},"get:Excel"),
+				beego.NSRouter("/Excel",&controllers.ExcelController{},"get:Excel"),
 			),
 		)
 	beego.AddNamespace(ns)
