@@ -42,6 +42,7 @@ func (c *ExcelController) Excel() {
 		fmt.Println("nums: ", num)
 		//fmt.Println("maps:",maps)
 		input := c.Input()
+		fmt.Println("input:",input)//input: map[4:[银行行号:number] 5:[邮编:zip] sql:[select id,name,phone,addr,number,zip from res_bank_list] 0:[ID:id] 1:[银行名称:name] 2:[电话:phone] 3:[地址:addr]]
 		data := make([]string, len(input)-1)
 		for key, _ := range input {
 			if key == "sql" {
