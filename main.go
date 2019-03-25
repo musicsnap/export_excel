@@ -4,6 +4,7 @@ import (
 	_ "export_excel/routers"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func init()  {
@@ -13,7 +14,7 @@ func init()  {
 	username:=beego.AppConfig.String("db_username")
 	password:=beego.AppConfig.String("db_password")
 	dsn:=username + ":" + password + "@tcp(" + host + ":" + port + ")/" + database + "?charset=utf8&loc=Asia%2FShanghai"
-
+	orm.RegisterDriver("mysql", orm.DRMySQL)
 	orm.RegisterDataBase("default", "mysql", dsn, 30)
 
 	db := orm.NewOrm()
@@ -21,7 +22,7 @@ func init()  {
 }
 
 func main() {
-	orm.Debug = true
+	//orm.Debug = true
 	beego.Run()
 }
 

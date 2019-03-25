@@ -3,10 +3,10 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"strings"
-	"github.com/tealeg/xlsx"
 	"fmt"
 	"time"
+	"strings"
+	"github.com/tealeg/xlsx"
 	"strconv"
 )
 
@@ -19,19 +19,17 @@ func (c *ExcelController) Prepare() {
 }
 
 func (c *ExcelController) Excel() {
+	beego.BConfig.WebConfig.AutoRender = false
 	db:=orm.NewOrm()
+	sql:= c.GetString("sql")
+	fmt.Println(sql)
+	start := time.Now()
 	var maps []orm.Params
-
 	var file *xlsx.File
 	var sheet *xlsx.Sheet
 	var row *xlsx.Row
 	var cell *xlsx.Cell
 	var err error
-
-	sql := c.GetString("sql")
-	fmt.Println(sql)
-	start := time.Now()
-
 	file = xlsx.NewFile()
 	sheet, err = file.AddSheet("Sheet1")
 
@@ -40,25 +38,20 @@ func (c *ExcelController) Excel() {
 	}
 
 	num, err := db.Raw(sql).Values(&maps)
-	if err == nil && num > 0 {
-		//这个地方是写入
-		//写入表头
+	if err == nil && num > 0{
+		fmt.Println("nums: ", num)
+		//fmt.Println("maps:",maps)
 		input := c.Input()
-		arr := make([]string, len(input)-2)
-
-		//由于map是无序的 这个地方取一个有序的数组来循环
+		data := make([]string, len(input)-1)
 		for key, _ := range input {
 			if key == "sql" {
 				continue
 			}
-
 			i, _ := strconv.Atoi(key)
-			arr[i] = input.Get(key)
+			data[i] = input.Get(key)
 
 		}
-
 		row = sheet.AddRow()
-
 		style := xlsx.NewStyle()
 		style.Font = *xlsx.NewFont(11, "宋体")
 		style.Font.Bold = true
@@ -66,43 +59,27 @@ func (c *ExcelController) Excel() {
 		style.Font.Color = "FFFF0000"
 
 		style.ApplyFont = true
-
-		//首行冻结 好像有点难度
-
-		//		style.Fill = *xlsx.NewFill("none", "FFFF0000", "00000000")
-		//		style.ApplyFill = true
-
-		for _, value := range arr {
-
+		for _, value := range data {
 			split := strings.Split(value, ":")
-
 			cell = row.AddCell()
 			cell.Value = split[0]
 			cell.SetStyle(style)
-
 		}
-
-		//style.Fill = *xlsx.DefaultFill()
-
-		style = xlsx.NewStyle()
-		style.Font = *xlsx.NewFont(11, "宋体")
-		style.ApplyFont = true
-
 		for i := 0; i < int(num); i++ {
 			row = sheet.AddRow()
-			for _, value := range arr {
+			for _, value := range data {
 				split := strings.Split(value, ":")
 				if maps[i][split[1]] == nil {
 					row.AddCell().Value = ""
 				} else {
 					cell = row.AddCell()
-					cell.SetStyle(style)
 					cell.Value = maps[i][split[1]].(string)
 				}
 			}
 		}
-	} else {
 
+	}else {
+		beego.Error("excel is error")
 	}
 	file.Write(c.Ctx.ResponseWriter)
 	end := time.Since(start)
